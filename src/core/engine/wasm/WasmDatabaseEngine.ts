@@ -720,8 +720,7 @@ export class WasmDatabaseEngine implements DatabaseOperations {
           let selectStmt: WasmPreparedStatement | null = null;
 
           try {
-              let fallbackParsedPatch: unknown = undefined;
-              let hasParsedFallbackPatch = false;
+              const parsedPatchCache = new Map<string, unknown>();
 
               if (op === 'json_patch' && !this.hasJsonPatch) {
                  selectStmt = this.instance.prepare(`SELECT ${escapedColumn} FROM ${escapedTable} WHERE rowid = ?`);
@@ -753,14 +752,19 @@ export class WasmDatabaseEngine implements DatabaseOperations {
                          try { currentObj = JSON.parse(currentValue); } catch (e) { console.warn('Failed to parse current JSON value for patching (updateCells)', e); }
                      }
 
-                     // Since columnUpdates all share the same column/operation context,
-                     // the patch object is identical for every row in the batch.
-                     if (!hasParsedFallbackPatch) {
-                         fallbackParsedPatch = typeof update.value === 'string' ? JSON.parse(update.value as string) : update.value;
-                         hasParsedFallbackPatch = true;
+                     let patchObj: unknown;
+                     if (typeof update.value === 'string') {
+                         if (parsedPatchCache.has(update.value)) {
+                             patchObj = parsedPatchCache.get(update.value);
+                         } else {
+                             patchObj = JSON.parse(update.value);
+                             parsedPatchCache.set(update.value, patchObj);
+                         }
+                     } else {
+                         patchObj = update.value;
                      }
 
-                     const newValueObj = applyMergePatch(currentObj, fallbackParsedPatch);
+                     const newValueObj = applyMergePatch(currentObj, patchObj);
                      const newValueStr = JSON.stringify(newValueObj);
 
                      stmt.run([newValueStr, rowIdNum]);
