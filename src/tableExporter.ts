@@ -87,7 +87,6 @@ export function getFormatHelper(format: string, tableName: string, includeHeader
  */
 export async function exportTableCommand(
   context: vsc.ExtensionContext,
-  reporter: TelemetryReporter | undefined,
   dbParams: DbParams,
   columns: string[],
   _dbOptions?: unknown,

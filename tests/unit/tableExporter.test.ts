@@ -189,7 +189,6 @@ describe('exportTableCommand Fallback', () => {
 
             await exportTableCommand(
                 {} as any,
-                undefined,
                 { table: 'test_table', uri: 'vscode-sqlite://test.db' },
                 ['id', 'name'],
                 undefined,
@@ -272,7 +271,6 @@ describe('exportTableCommand Fallback', () => {
 
             await exportTableCommand(
                 {} as any,
-                undefined,
                 { table: 'test_table', uri: 'vscode-sqlite://test.db' },
                 ['id', 'name'],
                 undefined,
@@ -342,7 +340,6 @@ describe('exportTableCommand Fallback', () => {
 
             await exportTableCommand(
                 {} as any,
-                undefined,
                 { table: 'test_table', uri: 'vscode-sqlite://test.db' },
                 ['id', 'name'],
                 undefined,
